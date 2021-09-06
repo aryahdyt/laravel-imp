@@ -33,8 +33,11 @@ class ProductController extends Controller
                     return $product->merchant->merchant_name;
                 })
                 ->addColumn('action', function ($row) {
-                    $actionBtn = '<a href="' . route('product.edit', $row->id) . '" class="edit btn btn-success btn-sm">Edit</a> <a href="' . route('product.destroy', $row->id) . '" class="delete btn btn-danger btn-sm">Delete</a>';
-                    return $actionBtn;
+                    // $actionBtn = '<a href="' . route('product.edit', $row->id) . '" class="edit btn btn-success btn-sm">Edit</a> <a href="' . route('product.destroy', $row->id) . '" class="delete btn btn-danger btn-sm">Delete</a>';
+                    $btn = '<a href="' . route('product.edit', $row->id) . '" class="edit btn btn-primary btn-sm">Edit</a>';
+                    $btnAction = $btn . "<form action='" . route('product.destroy', $row->id) . "' method='post'>" . csrf_field() . "" . method_field("DELETE") . "<button type='submit' class='btn btn-danger btn-sm' onclick='return confirm(' Yakin hapus data ? ');'>X</button></form>";
+
+                    return $btnAction;
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -65,7 +68,7 @@ class ProductController extends Controller
 
         $product = Product::create($request->all());
 
-        return redirect()->route('products.index');
+        return redirect()->route('product.index');
     }
 
     /**
@@ -87,7 +90,10 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        //
+        return view('product.edit', [
+            'product' => $product,
+            'merchant' => Merchant::get()
+        ]);
     }
 
     /**
@@ -99,7 +105,11 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+        // dd($request);
+
+        $product->update($request->all());
+
+        return redirect()->route('product.index');
     }
 
     /**
@@ -110,7 +120,7 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        dd($product);
+        // dd($product);
         $product->delete();
 
         return redirect()->route('product.index');
