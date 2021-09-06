@@ -24,23 +24,21 @@ class ProductController extends Controller
 
     public function getProduct(Request $request)
     {
-
+        // dd($request);
         if ($request->ajax()) {
             $data = Product::without('merchant');
             return DataTables::eloquent($data)
                 ->addIndexColumn()
                 ->addColumn('merchant', function (Product $product) {
-                    // return $product->merchant->map(function ($product) {
                     return $product->merchant->merchant_name;
-                    // });
                 })
                 ->addColumn('action', function ($row) {
-                    $actionBtn = '<a href="javascript:void(0)" class="edit btn btn-success btn-sm">Edit</a> <a href="javascript:void(0)" class="delete btn btn-danger btn-sm">Delete</a>';
+                    $actionBtn = '<a href="' . route('product.edit', $row->id) . '" class="edit btn btn-success btn-sm">Edit</a> <a href="' . route('product.destroy', $row->id) . '" class="delete btn btn-danger btn-sm">Delete</a>';
                     return $actionBtn;
                 })
                 ->rawColumns(['action'])
-                // ->make(true);
-                ->toJson();
+                ->make(true);
+            // ->toJson();
         }
     }
 
@@ -112,6 +110,9 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        dd($product);
+        $product->delete();
+
+        return redirect()->route('product.index');
     }
 }
